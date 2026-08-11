@@ -75,36 +75,6 @@ header.app-bar{background:var(--card);border-bottom:1px solid var(--line);paddin
 .pill.sync{background:var(--tint);color:var(--brand)}.pill.low{background:#fee2e2;color:var(--bad)}
 .pill.paid{background:#dcfce7;color:var(--ok)}.pill.unpaid{background:#fee2e2;color:var(--bad)}.pill.partial{background:#fef3c7;color:var(--warn)}
 .toolbar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-/* Sale action buttons — usable on mobile */
-#cartPanelSale .toolbar:last-of-type{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
-  margin-top:10px;
-  margin-bottom:4px;
-}
-#cartPanelSale .toolbar:last-of-type .btn{
-  min-height:44px;
-  width:100%;
-  font-size:12.5px;
-  font-weight:700;
-  padding:10px 6px;
-  border-radius:11px;
-  white-space:nowrap;
-}
-#cartPanelSale .toolbar:last-of-type #btnQuote{grid-column:span 1}
-@media(max-width:420px){
-  #cartPanelSale .toolbar:last-of-type{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-/* Light native feel */
-html,body{-webkit-tap-highlight-color:transparent}
-.btn,.panel-tab,.nav-item{transition:transform .12s ease,opacity .12s ease}
-.btn:active,.panel-tab:active{transform:scale(.97);opacity:.92}
-.modal-bg{animation:orbitFadeIn .18s ease}
-@keyframes orbitFadeIn{from{opacity:0}to{opacity:1}}
-.modal{animation:orbitSheetUp .22s ease}
-@keyframes orbitSheetUp{from{transform:translateY(12px);opacity:.96}to{transform:none;opacity:1}}
-
 .hint{font-size:11px;color:var(--muted);background:var(--tint);border:1px dashed var(--line);border-radius:8px;padding:8px;margin-top:8px;line-height:1.5}
 .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:flex-end;justify-content:center;z-index:300;padding:0}
 .modal-bg.open{display:flex}
@@ -837,58 +807,6 @@ input,select,textarea{
   .panel-switch-item:last-child{border-bottom:0;}
   .panel-switch-item:active,.panel-switch-item:hover{background:var(--blue-tint,#eaf1fc);color:var(--blue-deep,#0b3d91);}
 
-
-/* ===== Sale action grid ===== */
-.sale-actions-grid{
-  display:grid !important;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:8px;
-  margin:12px 0 8px;
-  width:100%;
-}
-.sale-actions-grid .sa-btn{
-  min-height:48px !important;
-  width:100% !important;
-  padding:10px 4px !important;
-  font-size:13px !important;
-  font-weight:700 !important;
-  border-radius:12px !important;
-  white-space:nowrap;
-  display:inline-flex !important;
-  align-items:center;
-  justify-content:center;
-}
-.sale-actions-grid #createInvoiceBtn{
-  grid-column:1 / -1;
-  min-height:52px !important;
-  font-size:15px !important;
-}
-html,body{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-input,textarea,select,[contenteditable]{-webkit-user-select:text!important;user-select:text!important}
-.btn:active,.sa-btn:active,.panel-tab:active{transform:scale(.97);opacity:.9}
-.btn,.sa-btn,.panel-tab{transition:transform .12s ease,opacity .12s ease}
-.modal-bg.open{animation:orbitFadeIn .2s ease}
-@keyframes orbitFadeIn{from{opacity:0}to{opacity:1}}
-.modal-bg.open .modal{animation:orbitSheetUp .24s ease}
-@keyframes orbitSheetUp{from{transform:translateY(16px);opacity:.9}to{transform:none;opacity:1}}
-
-
-.mm-functions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 4px 8px}
-.mm-functions button{min-height:44px!important;border-radius:10px!important;font-weight:700!important;background:#f8fafc;border:1px solid var(--line,#e2e8f0)!important;width:100%}
-#orbitSuccessOverlay,#orbitShareOverlay{display:none;position:fixed;inset:0;z-index:200000;background:rgba(15,23,42,.5);align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
-#orbitSuccessOverlay.show,#orbitShareOverlay.show{display:flex}
-#orbitSuccessOverlay .box,#orbitShareOverlay .box{background:#fff;border-radius:18px;padding:28px 22px;width:100%;max-width:320px;text-align:center;box-shadow:0 20px 50px rgba(15,23,42,.25);animation:orbitPop .28s ease}
-#orbitSuccessOverlay .check{width:56px;height:56px;border-radius:50%;background:#dcfce7;color:#158a53;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-#orbitSuccessOverlay h3,#orbitShareOverlay h3{font-size:18px;margin:0 0 6px}
-#orbitSuccessOverlay .invno{font-size:14px;color:#64748b}
-#orbitSuccessOverlay .sub,#orbitShareOverlay .sub{font-size:13px;color:#64748b;margin-top:4px}
-#orbitShareOverlay .spin{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#0b3d91;border-radius:50%;margin:0 auto 12px;animation:orbitSpin .7s linear infinite}
-#orbitShareOverlay .done{font-size:28px;color:#158a53;margin-bottom:8px;display:none}
-.orbit-confetti{position:fixed;inset:0;pointer-events:none;z-index:200001;overflow:hidden}
-.orbit-confetti i{position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;animation:orbitFall 1.4s linear forwards}
-@keyframes orbitPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes orbitSpin{to{transform:rotate(360deg)}}
-@keyframes orbitFall{to{transform:translateY(100vh) rotate(360deg);opacity:0}}
 </style>
 
 
@@ -995,14 +913,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text!important;user-
     <button type="button" data-mm="btnDayClose">Day close</button>
     <button type="button" data-mm="btnRecent">Recent bills</button>
     <button type="button" data-mm="btnRefreshSync">Sync</button>
-    <h4>Functions</h4>
-    <div class="mm-functions">
-      <button type="button" id="mmFnQuote">Quote</button>
-      <button type="button" id="mmFnSplit">Split</button>
-      <button type="button" id="mmFnHold">Hold</button>
-      <button type="button" id="mmFnReturn">Return</button>
-      <button type="button" id="mmFnShift">Shift</button>
-    </div>
+    <button type="button" data-mm="btnHelp">Keyboard shortcuts</button>
     <h4>Session</h4>
     
       <div class="panel-switch" id="panelSwitch">
@@ -1153,13 +1064,14 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text!important;user-
       <select id="waChannel"><option value="auto">Auto</option><option value="web">WhatsApp Web</option><option value="app">WhatsApp App</option></select>
     </div>
   </div>
-  <div class="sale-actions-grid" id="saleActionsGrid">
-    <button class="btn btn-primary sa-btn" id="createInvoiceBtn" type="button">Create</button>
-    <button class="btn btn-ghost sa-btn" id="btnQuote" type="button" title="Save cart as quotation">Quote</button>
-    <button class="btn btn-ghost sa-btn" id="btnSplit" type="button">Split</button>
-    <button class="btn btn-ghost sa-btn" id="btnHold2" type="button">Hold</button>
-    <button class="btn btn-ghost sa-btn" id="btnReturn" type="button">Return</button>
-    <button class="btn btn-ghost sa-btn" id="btnShift" type="button">Shift</button>
+  <div class="toolbar">
+    <button class="btn btn-primary btn-sm" id="createInvoiceBtn" type="button">Create</button>
+    <button class="btn btn-ghost btn-sm" id="btnQuote" type="button" title="Save cart as quotation">Quote</button>
+    <button class="btn btn-ghost btn-sm" id="btnSplit" type="button">Split</button>
+    <button class="btn btn-ghost btn-sm" id="btnHold2" type="button">Hold</button>
+    <button class="btn btn-ghost btn-sm" id="btnReturn" type="button">Return</button>
+    <button class="btn btn-ghost btn-sm" id="btnShift" type="button">Shift</button>
+    
   </div>
   <div class="msg" id="invoiceMsg"></div>
 </div><!-- /cartPanelSale -->
@@ -1416,10 +1328,6 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text!important;user-
 <div id="printRoot"></div>
 <div class="toast" id="toast"></div>
 <script src="qrcode.min.js"></script>
-
-<div id="orbitSuccessOverlay" aria-hidden="true"><div class="box"><div class="check">✓</div><h3>Invoice Created</h3><div class="invno" id="orbitSuccessInvNo"></div><div class="sub">Ready to print or share</div></div></div>
-<div id="orbitShareOverlay" aria-hidden="true"><div class="box"><div class="spin" id="orbitShareSpin"></div><div class="done" id="orbitShareDone">✓</div><h3 id="orbitShareTitle">Preparing…</h3><div class="sub" id="orbitShareSub"></div></div></div>
-
 <script src="Db.js"></script>
 <script>
 const API="/api/admin"; // unused — local IndexedDB via tsLocalApi
@@ -1796,40 +1704,6 @@ function blobToBase64(blob){
 
 /** Save file so it can appear in Downloads / Gallery / share targets */
 async function saveBlobToDevice(blob, filename, meta){
-  try {
-    if (blob && typeof window.__orbitNativeShare === "function") {
-      var ePrefShare = await window.__orbitNativeShare({
-        blob: blob, filename: filename, title: filename, text: "Invoice from OrbitBills",
-        mime: (blob && blob.type) || (meta && meta.mime) || "application/octet-stream",
-        dialogTitle: "Save or share invoice"
-      });
-      if (ePrefShare) {
-        var _item = (typeof registerOrbitDownload === "function") ? registerOrbitDownload(blob, filename, meta || {}) : null;
-        try { toast("Pick Gallery, WhatsApp, Drive, or Files"); } catch (e) {}
-        return _item;
-      }
-    }
-  } catch (e) { console.warn(e); }
-
-  // Prefer unified native share (WhatsApp / Drive / Gallery via system sheet)
-  try{
-    if(typeof window.__orbitNativeShare === "function" && blob){
-      var sharedN = await window.__orbitNativeShare({
-        blob: blob,
-        filename: filename,
-        title: filename,
-        text: "Invoice from OrbitBills",
-        mime: (blob && blob.type) || (meta && meta.mime) || "application/octet-stream",
-        dialogTitle: "Save or share invoice"
-      });
-      if(sharedN){
-        const item = registerOrbitDownload(blob, filename, meta || {});
-        try{ toast("Pick Gallery, WhatsApp, Drive, or Files"); }catch(e){}
-        return item;
-      }
-    }
-  }catch(ePref){ console.warn(ePref); }
-
   const item = registerOrbitDownload(blob, filename, meta || {});
   const mime = (blob && blob.type) || (meta && meta.mime) || "application/octet-stream";
   // 1) Capacitor Filesystem → Documents / Cache (then share)
@@ -2852,31 +2726,6 @@ async function finalizeSale(payload, doPrint){
   }
   return data;
 }
-
-/* Invoice success chime (no external file) */
-window.__orbitInvoiceSound = function(){
-  try{
-    var Ctx = window.AudioContext || window.webkitAudioContext;
-    if(!Ctx) return;
-    var ctx = window.__orbitAudioCtx || (window.__orbitAudioCtx = new Ctx());
-    if(ctx.state === "suspended") ctx.resume();
-    var now = ctx.currentTime;
-    function tone(freq, start, dur, gain){
-      var o = ctx.createOscillator();
-      var g = ctx.createGain();
-      o.type = "sine";
-      o.frequency.value = freq;
-      g.gain.setValueAtTime(0.0001, now + start);
-      g.gain.exponentialRampToValueAtTime(gain, now + start + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(now + start); o.stop(now + start + dur + 0.02);
-    }
-    tone(880, 0, 0.12, 0.12);
-    tone(1174.7, 0.1, 0.16, 0.1);
-  }catch(e){}
-};
-
 async function createInvoice(){
   if(!cart.length){ toast("Add items"); return; }
   try{ await finalizeSale(buildCheckoutPayload(), false); }
@@ -2890,35 +2739,8 @@ async function payAndPrint(){
     await finalizeSale(buildCheckoutPayload({ status:"paid", amountPaid:t.total, payments:[{method, amount:t.total}] }), true);
   }catch(e){ console.error(e); toast("Pay error"); }
 }
-document.getElementById("createInvoiceBtn").addEventListener("click", async function(){
-  var btn = document.getElementById("createInvoiceBtn");
-  var prev = btn ? btn.textContent : "Create";
-  try {
-    if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
-    await createInvoice();
-    if (lastInvoicePayload && lastInvoiceId) {
-      var invNo = lastInvoicePayload.invoiceNumber || lastInvoiceId;
-      try { window.__orbitInvoiceSound && window.__orbitInvoiceSound(); } catch (e) {}
-      try { window.__orbitShowInvoiceSuccess && window.__orbitShowInvoiceSuccess(invNo); } catch (e) {}
-      try { window.__orbitHaptic && window.__orbitHaptic("success"); } catch (e) {}
-    }
-  } catch (e) { console.warn(e); }
-  finally { if (btn) { btn.disabled = false; btn.textContent = prev; } }
-});
-document.getElementById("btnPayPrint").addEventListener("click", async function(){
-  var btn = document.getElementById("btnPayPrint");
-  var prev = btn ? btn.textContent : "Pay & Print";
-  try {
-    if (btn) { btn.disabled = true; btn.textContent = "Processing…"; }
-    await payAndPrint();
-    if (lastInvoicePayload && lastInvoiceId) {
-      try { window.__orbitInvoiceSound && window.__orbitInvoiceSound(); } catch (e) {}
-      try { window.__orbitShowInvoiceSuccess && window.__orbitShowInvoiceSuccess(lastInvoicePayload.invoiceNumber || lastInvoiceId); } catch (e) {}
-      try { window.__orbitHaptic && window.__orbitHaptic("success"); } catch (e) {}
-    }
-  } catch (e) { console.warn(e); }
-  finally { if (btn) { btn.disabled = false; btn.textContent = prev; } }
-});
+document.getElementById("createInvoiceBtn").addEventListener("click", createInvoice);
+document.getElementById("btnPayPrint").addEventListener("click", payAndPrint);
 
 /* Split */
 function openSplitModal(){
@@ -3577,6 +3399,7 @@ document.getElementById("clientSelect")?.addEventListener("change", updateWhatsA
 async function sendInvoiceWhatsApp(){
   if (!lastInvoicePayload) { toast("Create or open an invoice first"); return; }
   const phone = clientPhoneForSale();
+  if (!phone) { toast("Select a client with a phone number"); return; }
   const kind = ((document.getElementById("waFileKind") || {}).value || "png").toLowerCase();
   const invNo = String(lastInvoicePayload.invoiceNumber || "invoice").replace(/[^\w\-]+/g, "_");
   const brand = (branding && (branding.brand_name || branding.brandName)) || "OrbitBills";
@@ -3587,19 +3410,22 @@ async function sendInvoiceWhatsApp(){
     "Please find your invoice *" + invNo + "* from *" + brand + "*.\n" +
     "Total: " + total + "\n" +
     "Status: " + (lastInvoicePayload.status || "");
+
   let blob = null;
   let filename = "invoice-" + invNo + (kind === "pdf" ? ".pdf" : ".png");
   let mime = kind === "pdf" ? "application/pdf" : "image/png";
+
   try {
-    try { window.__orbitShareProgress && window.__orbitShareProgress("sending"); } catch (e) {}
+    toast("Preparing invoice for WhatsApp…");
     if (kind === "pdf") {
       const canvas = await invoiceHtmlToCanvas(lastInvoicePayload, 2);
       const paper = (typeof selectedPaper === "function") ? selectedPaper() : { wPt: 595.28, hPt: 841.89 };
-      blob = new Blob([canvasToSimplePdf(canvas, paper)], { type: "application/pdf" });
+      blob = canvasToSimplePdf(canvas, paper);
+      blob = new Blob([blob], { type: "application/pdf" });
     } else {
       const canvas = await invoiceHtmlToCanvas(lastInvoicePayload, 2);
-      blob = await new Promise(function (resolve) {
-        try { canvas.toBlob(function (bb) { resolve(bb); }, "image/png", 0.95); } catch (e) { resolve(null); }
+      blob = await new Promise(function(resolve){
+        try { canvas.toBlob(function(b){ resolve(b); }, "image/png", 0.95); } catch (e) { resolve(null); }
       });
       if (!blob || !blob.size) {
         const dataUrl = canvas.toDataURL("image/png");
@@ -3608,47 +3434,88 @@ async function sendInvoiceWhatsApp(){
         const arr = new Uint8Array(raw.length);
         for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
         blob = new Blob([arr], { type: "image/png" });
+      } else {
+        blob = new Blob([blob], { type: "image/png" });
       }
     }
+    try { registerOrbitDownload(blob, filename, { kind: kind === "pdf" ? "pdf" : "png", mime: mime, invoiceNumber: invNo, total: lastInvoicePayload.total }); } catch (e) {}
+  } catch (prepErr) {
+    console.warn(prepErr);
+    blob = null;
+  }
+
+  let file = null;
+  if (blob) {
+    try { file = new File([blob], filename, { type: mime, lastModified: Date.now() }); } catch (e) { file = null; }
+  }
+
+  // Try attach via system share (user can still pick WhatsApp)
+  let shared = false;
+  try {
+    const Cap = window.Capacitor;
+    const plugins = Cap && Cap.Plugins;
+    const Share = plugins && plugins.Share;
+    const Filesystem = plugins && plugins.Filesystem;
+    if (Share && Share.share && Filesystem && blob) {
+      const b64 = await new Promise(function(resolve, reject){
+        const r = new FileReader();
+        r.onload = function(){ const s = String(r.result || ""); const i = s.indexOf(","); resolve(i >= 0 ? s.slice(i + 1) : s); };
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+      const path = "OrbitBills/" + filename;
+      let uri = null;
+      for (const dir of ["CACHE", "DATA"]) {
+        try {
+          await Filesystem.writeFile({ path: path, data: b64, directory: dir, recursive: true });
+          const uriRes = await Filesystem.getUri({ path: path, directory: dir });
+          uri = uriRes && (uriRes.uri || uriRes);
+          if (uri) break;
+        } catch (e) {}
+      }
+      if (uri) {
+        try {
+          await Share.share({ title: "Invoice " + invNo, text: msgText, files: [uri], dialogTitle: "WhatsApp" });
+          shared = true;
+        } catch (e) {
+          try { await Share.share({ title: "Invoice " + invNo, text: msgText, url: uri, dialogTitle: "WhatsApp" }); shared = true; } catch (e2) {}
+        }
+      }
+    }
+  } catch (e) { console.warn(e); }
+
+  if (!shared && file && navigator.share) {
     try {
-      registerOrbitDownload(blob, filename, { kind: kind === "pdf" ? "pdf" : "png", mime: mime, invoiceNumber: invNo, total: lastInvoicePayload.total });
-    } catch (e) {}
-  } catch (prepErr) { console.warn(prepErr); blob = null; }
-
-  try { window.__orbitShareProgress && window.__orbitShareProgress("ready"); } catch (e) {}
-  await new Promise(function (r) { setTimeout(r, 300); });
-
-  var shared = false;
-  if (blob && typeof window.__orbitNativeShare === "function") {
-    try {
-      shared = !!(await window.__orbitNativeShare({
-        blob: blob, filename: filename, title: "Invoice " + invNo, text: msgText, mime: mime, dialogTitle: "Share invoice"
-      }));
-    } catch (e) { console.warn(e); }
-  }
-  if (!shared && blob && typeof window.__orbitNativeDownload === "function") {
-    try { shared = !!(await window.__orbitNativeDownload(blob, filename)); } catch (e) {}
-  }
-  if (shared) {
-    try { window.__orbitShareProgress && window.__orbitShareProgress("hide"); } catch (e) {}
-    toast("Share sheet opened — pick WhatsApp, Drive, or Files");
-    return;
+      if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Invoice " + invNo, text: msgText });
+        shared = true;
+      }
+    } catch (e) {
+      if (e && e.name === "AbortError") { toast("Share cancelled"); return; }
+    }
   }
 
-  try { window.__orbitShareProgress && window.__orbitShareProgress("whatsapp"); } catch (e) {}
-  await new Promise(function (r) { setTimeout(r, 350); });
-  try { window.__orbitShareProgress && window.__orbitShareProgress("hide"); } catch (e) {}
-
-  if (phone) {
-    var waUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msgText + (blob ? "\n\n(Attach from Downloads if needed)" : ""));
-    try { window.location.href = waUrl; } catch (e) { try { window.open(waUrl, "_blank"); } catch (e2) {} }
-    toast(blob ? "WhatsApp opened — attach from Downloads if needed" : "Opening WhatsApp");
-  } else {
-    toast("Use ☰ Downloads → Share");
-    try { if (window.__orbitOpenDownloads) window.__orbitOpenDownloads(); } catch (e) {}
+  // Always open THIS customer's WhatsApp chat (selected client number)
+  const waUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msgText);
+  try {
+    // Prefer location on mobile app/WebView so it hands off to WhatsApp reliably
+    const isCap = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    const isMobile = isCap || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+    if (isMobile) {
+      window.location.href = waUrl;
+    } else {
+      const w = window.open(waUrl, "_blank");
+      if (!w) window.location.href = waUrl;
+    }
+  } catch (e) {
+    window.location.href = waUrl;
   }
+
+  toast(shared
+    ? ("Opening WhatsApp chat for " + phone + " — attach file if needed")
+    : ("Opening WhatsApp for " + phone + (blob ? " · invoice saved in Downloads" : "")));
+  try { if (window.__orbitHaptic) window.__orbitHaptic("success"); } catch (e) {}
 }
-
 document.getElementById("btnWhatsApp")?.addEventListener("click", () => { sendInvoiceWhatsApp(); });
 
 document.getElementById("btnHelp").addEventListener("click",()=>openModal("helpModal"));
@@ -4397,20 +4264,6 @@ window.__calcOpen = false;
   async function systemShareFile(it){
     var title = "Invoice " + (it.invoiceNumber || "");
     var textMsg = invoiceShareText(it);
-    // Prefer unified native share
-    try{
-      if(it.blob && typeof window.__orbitNativeShare === "function"){
-        var okN = await window.__orbitNativeShare({
-          blob: it.blob,
-          filename: it.filename || ("invoice." + (it.kind || "bin")),
-          title: title,
-          text: textMsg,
-          mime: it.mime || (it.blob && it.blob.type) || "application/octet-stream",
-          dialogTitle: "Share invoice"
-        });
-        if(okN) return true;
-      }
-    }catch(eN){ console.warn(eN); }
     var file = await blobAsFile(it);
 
     // Capacitor Share + Filesystem
