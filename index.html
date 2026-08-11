@@ -191,6 +191,15 @@
     background:#e0f2fe;
   }
   .footer a{color:var(--brand);font-weight:600}
+
+  .anim-rise{animation:orbitRise .45s ease both}
+  .anim-rise.d1{animation-delay:.05s}
+  .anim-rise.d2{animation-delay:.12s}
+  .anim-rise.d3{animation-delay:.2s}
+  .anim-rise.d4{animation-delay:.28s}
+  @keyframes orbitRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .btn,.panel-link{transition:transform .12s ease,opacity .12s ease}
+  .btn:active,.panel-link:active{transform:scale(.98);opacity:.92}
 </style>
 </head>
 <body>
@@ -221,7 +230,7 @@
     </nav>
 
     <section class="hero">
-      <div class="hero-inner">
+      <div class="hero-inner anim-rise d1">
         <div class="hero-kicker">OrbitBills by TechSerenia</div>
         <h1>Billing software for everyday business</h1>
         <p>Create invoices, manage products, and keep track of payments — from your phone or computer.</p>
@@ -232,7 +241,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section anim-rise d2">
       <h2>What you can do</h2>
       <p class="lead">Practical tools for shops, counters, and small teams.</p>
       <div class="grid cols-3">
@@ -251,7 +260,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section anim-rise d3">
       <h2>Workspaces</h2>
       <p class="lead">After you sign in, you can move between these areas from the app menu.</p>
       <div class="panels">
