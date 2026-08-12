@@ -16,7 +16,7 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#0b3d91">
 <meta name="color-scheme" content="light">
-<title>Billing · OrbitBills</title>
+<title>Billing · TechSerenia</title>
 <link rel="icon" href="favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -143,7 +143,7 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 /* ========== OrbitBills Mobile POS (presentation only) ========== */
 .m-only{display:none}
 .d-only{display:initial}
-.mobile-menu-btn,.mobile-menu,.m-cart-bar,.m-cart-sheet,.m-cart-backdrop{display:none}
+.mobile-menu-btn,.mobile-menu,.m-cart-bar,.m-cart-sheet,.m-cart-backdrop,.pos-bottom-nav,.pos-filter-row{display:none}
 #btnScanPrimary{display:none}
 #btnShowMoreProducts,#btnShowMorePhotos{display:none}
 
@@ -186,10 +186,11 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     box-shadow:0 2px 10px rgba(11,61,145,.28);
   }
   body::before{background:#0b3d91!important}
-  .brand{font-size:15px;gap:6px;min-width:0;line-height:1;align-items:center;color:#fff!important}
+  .brand{font-size:15px;gap:8px;min-width:0;line-height:1;align-items:center;color:#fff!important}
   .brand .brand-mark{height:30px!important;display:flex;align-items:center}
   .brand .brand-mark img{height:30px!important;width:auto;display:block;filter:brightness(0) invert(1)}
-  .brand span{display:none}
+  .brand .brand-name-text{display:inline!important;color:#fff!important;font-weight:700;font-size:16px;font-family:var(--display);letter-spacing:-0.02em}
+  .brand span:not(.brand-name-text){display:none}
   .header-actions{gap:6px;flex-wrap:nowrap;overflow:visible;width:auto;margin-left:auto;align-items:center}
   .header-actions > .btn,
   .header-actions > .pill,
@@ -264,15 +265,15 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     background:#f8fafc;border-radius:10px;margin:2px 4px
   }
 
-  /* Single column — products primary */
+  /* Single column — products primary; tight under header */
   .layout{
     display:flex!important;flex-direction:column;
     min-height:auto;
-    padding-bottom:calc(58px + env(safe-area-inset-bottom,0px));
+    padding-bottom:calc(118px + env(safe-area-inset-bottom,0px));
   }
   .sales-side{
     border-right:0;border-bottom:none;
-    padding:10px 12px 12px;overflow:visible;min-width:0;width:100%
+    padding:6px 12px 12px;overflow:visible;min-width:0;width:100%
   }
 
   /* Cart moves into bottom sheet on mobile — hide inline cart column content from flow
@@ -395,24 +396,41 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 
   .m-sticky-tools{
     position:sticky;top:0;z-index:40;
-    background:var(--bg);padding:6px 0 8px;
+    background:var(--bg);padding:4px 0 6px;
     margin:0 -12px;padding-left:12px;padding-right:12px;
     border-bottom:1px solid var(--line);
   }
-  .m-sticky-tools .panel-tabs{margin-bottom:8px}
-  .m-sticky-tools .search-bar{margin-bottom:0}
+  .m-sticky-tools .panel-tabs{margin-bottom:6px}
+  .m-sticky-tools .search-bar{margin-bottom:6px}
   .search-bar #scanField{
     max-width:none!important;flex:0 0 auto;min-width:0;
-    order:3;display:none!important;
+    order:4;display:none!important;
   }
   .search-bar #btnScanPrimary{
-    display:inline-flex!important;align-items:center;justify-content:center;
-    min-height:46px;padding:10px 14px;border-radius:12px;
-    background:var(--brand);color:#fff;border:0;font-weight:700;font-size:14px;
-    flex:0 0 auto;white-space:nowrap;
+    display:inline-flex!important;align-items:center;justify-content:center;gap:6px;
+    min-height:44px;padding:8px 12px;border-radius:12px;
+    background:var(--brand);color:#fff;border:0;font-weight:700;font-size:13px;
+    flex:0 0 auto;white-space:nowrap;order:1;
   }
-  .search-bar #productSearch{order:1;flex:1}
-  .search-bar #categoryFilter{order:2}
+  .search-bar #btnScanPrimary svg{flex-shrink:0}
+  .search-bar #productSearch{order:2;flex:1;min-width:0}
+  .search-bar #categoryFilter{order:3;max-width:120px}
+  .pos-filter-row{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:2px;
+  }
+  .pos-filter-btn{
+    flex:1 1 auto;min-height:40px;padding:8px 12px;border-radius:10px;
+    border:1px solid #e2e8f0;background:#fff;color:#0f172a;
+    font-size:13px;font-weight:600;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .pos-filter-btn.active{
+    background:#0b3d91;color:#fff;border-color:#0b3d91;
+  }
+  .pos-filter-btn.pos-filter-clear{
+    flex:0 0 auto;background:#fef2f2;color:#b91c1c;border-color:#fecaca;
+  }
+  #stockSummary{display:none!important}
   .low-banner{display:none;position:relative;padding-right:36px}
   .low-banner .lb-dismiss{
     position:absolute;right:6px;top:50%;transform:translateY(-50%);
@@ -431,11 +449,12 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   /* Low banners compact */
   .low-banner{font-size:12.5px;padding:8px 10px;border-radius:10px;margin-bottom:8px}
 
-  /* Sticky cart bar — bill-book style: dark strip + green charge */
+  /* Sticky cart bar — sits above bottom nav */
   .m-cart-bar{
-    display:flex!important;position:fixed;left:0;right:0;bottom:0;z-index:100;
+    display:flex!important;position:fixed;left:0;right:0;
+    bottom:calc(56px + env(safe-area-inset-bottom,0px));z-index:100;
     align-items:center;gap:8px;
-    padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
+    padding:10px 12px;
     background:#0f172a;color:#fff;
     box-shadow:0 -8px 28px rgba(15,23,42,.28);
     cursor:pointer;-webkit-tap-highlight-color:transparent;
@@ -443,8 +462,28 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   #orbitNavFill,.orbit-nav-fill{
     position:fixed!important;left:0!important;right:0!important;bottom:0!important;
     height:max(env(safe-area-inset-bottom,0px),0px)!important;
-    background:#0f172a!important;z-index:99!important;pointer-events:none!important;
+    background:#fff!important;z-index:98!important;pointer-events:none!important;
   }
+  .pos-bottom-nav{
+    display:flex!important;position:fixed;left:0;right:0;
+    bottom:0;z-index:101;
+    height:calc(56px + env(safe-area-inset-bottom,0px));
+    padding:4px 2px calc(4px + env(safe-area-inset-bottom,0px));
+    background:#fff;border-top:1px solid #e2e8f0;
+    box-shadow:0 -2px 12px rgba(15,23,42,.06);
+    align-items:stretch;justify-content:space-around;gap:0;
+  }
+  .pos-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;border:0;background:transparent;color:#64748b;cursor:pointer;
+    padding:4px 2px;min-height:48px;border-radius:10px;
+    -webkit-tap-highlight-color:transparent;font-family:inherit;
+  }
+  .pos-nav-item span{font-size:10px;font-weight:600;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pos-nav-item svg{flex-shrink:0;stroke:#64748b}
+  .pos-nav-item.active{color:#0b3d91}
+  .pos-nav-item.active svg{stroke:#0b3d91}
+  .pos-nav-item:active{background:#f1f5f9}
   .m-cart-bar .mcb-info{flex:1;min-width:0}
   .m-cart-bar .mcb-label{font-size:11px;opacity:.85;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
   .m-cart-bar .mcb-amt{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15;color:#fff}
@@ -485,15 +524,15 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     min-height:48px!important;font-weight:700!important;border-radius:12px!important
   }
 
-  /* Calculator above cart bar */
+  /* Calculator above cart bar + bottom nav */
   #calcFab{
     right:14px!important;
-    bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;
+    bottom:calc(130px + env(safe-area-inset-bottom,0px))!important;
     z-index:10050!important;
     touch-action:manipulation!important;
   }
   body.m-cart-open #calcFab{
-    bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;
+    bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;
   }
   #calcPopup{
     left:50%!important;right:auto!important;
@@ -552,7 +591,7 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 }
 
 @media (min-width:769px){
-  .mobile-menu-btn,.mobile-menu,.m-cart-bar,.m-cart-backdrop,.m-cart-close{display:none!important}
+  .mobile-menu-btn,.mobile-menu,.m-cart-bar,.m-cart-backdrop,.m-cart-close,.pos-bottom-nav,.pos-filter-row{display:none!important}
   body.m-cart-open .cart-side{transform:none!important;position:static!important;max-height:none!important}
 }
 
@@ -577,7 +616,7 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   }
   .layout{
     min-height:auto!important;
-    padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))!important;
+    padding-bottom:calc(118px + env(safe-area-inset-bottom,0px))!important;
     overflow:visible!important;
     touch-action:pan-y!important;
   }
@@ -926,7 +965,7 @@ input,select,textarea{
     <span class="brand-mark" style="height:34px;display:flex;align-items:center;flex-shrink:0">
       <img src="logo.png" alt="TechSerenia" style="height:100%;width:auto;display:block" onerror="this.style.display='none'">
     </span>
-    <span>OrbitBills</span> <span>Billing</span>
+    <span class="brand-name-text">TechSerenia</span>
   </div>
   <div class="header-actions">
     <span class="badge" id="indiaClock" title="India Standard Time" style="font-variant-numeric:tabular-nums;min-width:118px;text-align:center">—</span>
@@ -999,12 +1038,20 @@ input,select,textarea{
     <button class="panel-tab" data-panel="recentPanel" type="button">Recent</button>
   </div>
   <div class="search-bar">
-    <input id="productSearch" placeholder="Search" autocomplete="off">
-    <select id="categoryFilter" title="Filter by category" style="max-width:140px;min-width:110px">
+    <button type="button" class="btn btn-primary" id="btnScanPrimary" title="Scan barcode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+      Scan
+    </button>
+    <input id="productSearch" placeholder="Search name, SKU or barcode" autocomplete="off">
+    <select id="categoryFilter" title="Filter by category" style="max-width:140px;min-width:100px">
       <option value="">All categories</option>
     </select>
-    <button type="button" class="btn btn-primary" id="btnScanPrimary" title="Scan barcode">Scan</button>
     <input id="scanField" placeholder="Barcode" style="max-width:120px" autocomplete="off">
+  </div>
+  <div class="pos-filter-row" id="posFilterRow">
+    <button type="button" class="pos-filter-btn" id="btnFilterOos" data-filter="oos">Out of stock</button>
+    <button type="button" class="pos-filter-btn" id="btnFilterExp" data-filter="expiring">Expiring</button>
+    <button type="button" class="pos-filter-btn pos-filter-clear" id="btnFilterClear" style="display:none">Clear filter</button>
   </div>
   </div>
   <div class="sales-panel active" id="textPanel"><div class="text-list" id="textList"></div><div class="empty" id="textEmpty">Type to search products by name, SKU or barcode</div><button type="button" class="btn btn-ghost btn-block" id="btnShowMoreProducts" style="display:none">Show more products</button></div>
@@ -1055,7 +1102,7 @@ input,select,textarea{
   <div class="form-field"><label>Client</label>
     <div style="display:flex;gap:6px;align-items:center">
       <select id="clientSelect" style="flex:1"><option value="">Walk-in</option></select>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnSearchClient" title="Search customers" aria-label="Search customers" style="min-width:40px;padding:8px 10px">🔍</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnSearchClient" title="Search customers" aria-label="Search customers" style="min-width:40px;padding:8px 10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnQuickClient" title="Add client">+</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnStatement" title="Client balance">Balance</button>
     </div>
@@ -2122,6 +2169,7 @@ function refreshCategoryFilterOptions(){
 let productListPageSize = 80;
 let productListShown = 80;
 let lastMatchedProducts = [];
+let posListFilter = ""; // "" | "oos" | "expiring"
 function isMobilePos(){
   try{
     if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return true;
@@ -2135,10 +2183,22 @@ function productIsOos(p){
   if(!isFinite(stock)) return false;
   return stock <= 0;
 }
+function productIsExpiring(p, days){
+  if(!p || !p.expiry_date) return false;
+  const d = new Date(p.expiry_date);
+  if(isNaN(d.getTime())) return false;
+  const limit = Date.now() + (days || 30) * 86400000;
+  return d.getTime() <= limit;
+}
 function renderProductLists(filter){
   const term=(filter!=null?filter:(document.getElementById("productSearch")||{}).value||"").toLowerCase().trim();
   const cat=getSelectedCategory().toLowerCase();
   let matched=(allProducts||[]).slice();
+  if(posListFilter === "oos"){
+    matched = matched.filter(productIsOos);
+  } else if(posListFilter === "expiring"){
+    matched = matched.filter(p => productIsExpiring(p, 30));
+  }
   if(cat){
     matched=matched.filter(p=>String(p.category||"").trim().toLowerCase()===cat);
   }
@@ -2150,7 +2210,8 @@ function renderProductLists(filter){
   const defL=parseInt(branding.default_low_stock_limit)||5;
   const mobile=isMobilePos();
   const limit = mobile ? productListShown : matched.length;
-  const textProducts=(term||cat)?matched:[];
+  const hasFilter = !!(term || cat || posListFilter);
+  const textProducts = hasFilter ? matched : [];
   const textSlice = mobile ? textProducts.slice(0, limit) : textProducts;
   document.getElementById("textList").innerHTML=textSlice.map((p,idx)=>{
     const low=(p.stock||0)<=(p.low_stock_limit!=null?p.low_stock_limit:defL);
@@ -2171,7 +2232,9 @@ function renderProductLists(filter){
   const textEmpty=document.getElementById("textEmpty");
   if(textEmpty){
     textEmpty.style.display=textProducts.length?"none":"block";
-    textEmpty.textContent=term?"No products match your search":"Type to search products by name, SKU or barcode";
+    if(posListFilter==="oos") textEmpty.textContent = term || cat ? "No out-of-stock products match" : "No out-of-stock products";
+    else if(posListFilter==="expiring") textEmpty.textContent = term || cat ? "No expiring products match" : "No products expiring in 30 days";
+    else textEmpty.textContent = term || cat ? "No products match your search" : "Scan barcode or search for a product";
   }
   const btnMoreT=document.getElementById("btnShowMoreProducts");
   if(btnMoreT){
@@ -2222,6 +2285,50 @@ document.getElementById("btnShowMorePhotos")?.addEventListener("click",()=>{
   productListShown += productListPageSize;
   renderProductLists(document.getElementById("productSearch").value);
 });
+function setPosListFilter(mode){
+  posListFilter = mode || "";
+  productListShown = productListPageSize;
+  document.querySelectorAll(".pos-filter-btn[data-filter]").forEach(b=>{
+    b.classList.toggle("active", b.getAttribute("data-filter") === posListFilter);
+  });
+  const clr = document.getElementById("btnFilterClear");
+  if(clr) clr.style.display = posListFilter ? "inline-flex" : "none";
+  renderProductLists(document.getElementById("productSearch").value);
+}
+document.getElementById("btnFilterOos")?.addEventListener("click",()=>{
+  setPosListFilter(posListFilter === "oos" ? "" : "oos");
+});
+document.getElementById("btnFilterExp")?.addEventListener("click",()=>{
+  setPosListFilter(posListFilter === "expiring" ? "" : "expiring");
+});
+document.getElementById("btnFilterClear")?.addEventListener("click",()=>setPosListFilter(""));
+(function initPosBottomNav(){
+  function activateNav(nav){
+    document.querySelectorAll(".pos-nav-item").forEach(b=>b.classList.toggle("active", b.getAttribute("data-nav")===nav));
+  }
+  function switchPanel(panelId){
+    const tab = document.querySelector('.panel-tab[data-panel="'+panelId+'"]');
+    if(tab) tab.click();
+  }
+  document.getElementById("navTextPos")?.addEventListener("click",()=>{ activateNav("text"); switchPanel("textPanel"); });
+  document.getElementById("navPhotoPos")?.addEventListener("click",()=>{ activateNav("photo"); switchPanel("photoPanel"); });
+  document.getElementById("navHeld")?.addEventListener("click",()=>{ activateNav("held"); switchPanel("heldPanel"); });
+  document.getElementById("navTransactions")?.addEventListener("click",()=>{ activateNav("recent"); switchPanel("recentPanel"); });
+  document.getElementById("navCalculator")?.addEventListener("click",()=>{
+    activateNav("calc");
+    const fab = document.getElementById("calcFab");
+    if(fab) fab.click();
+  });
+  document.querySelectorAll(".panel-tab").forEach(tab=>{
+    tab.addEventListener("click",()=>{
+      const p = tab.dataset.panel;
+      if(p==="textPanel") activateNav("text");
+      else if(p==="photoPanel") activateNav("photo");
+      else if(p==="heldPanel") activateNav("held");
+      else if(p==="recentPanel") activateNav("recent");
+    });
+  });
+})();
 document.getElementById("textList")?.addEventListener("click",e=>{
   const row=e.target.closest(".text-row[data-pid]");
   if(!row) return;
@@ -3905,9 +4012,33 @@ window.__calcOpen = false;
     onclick="event.stopPropagation();window.__orbitOpenMobileCart&&window.__orbitOpenMobileCart();">View bill</button>
 </div>
 
+<!-- Fixed bottom POS navigation (SVG icons, no emojis) -->
+<nav class="pos-bottom-nav" id="posBottomNav" aria-label="POS navigation">
+  <button type="button" class="pos-nav-item active" data-nav="text" id="navTextPos" title="Text POS">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span>Text POS</span>
+  </button>
+  <button type="button" class="pos-nav-item" data-nav="photo" id="navPhotoPos" title="Photo POS">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span>Photo POS</span>
+  </button>
+  <button type="button" class="pos-nav-item" data-nav="held" id="navHeld" title="Held bills">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+    <span>Held</span>
+  </button>
+  <button type="button" class="pos-nav-item" data-nav="recent" id="navTransactions" title="Transactions">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Transactions</span>
+  </button>
+  <button type="button" class="pos-nav-item" data-nav="calc" id="navCalculator" title="Calculator">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="8" y2="18.01"/><line x1="12" y1="18" x2="12" y2="18.01"/><line x1="16" y1="18" x2="16" y2="18.01"/></svg>
+    <span>Calculator</span>
+  </button>
+</nav>
+
 <!-- Calculator FAB -->
 <button type="button" id="calcFab" title="Calculator (press 0)" aria-label="Open calculator">
-  <img src="calc.png" alt="Calculator" onerror="this.style.display='none';this.parentElement.textContent='∑';">
+  <img src="calc.png" alt="Calculator" onerror="this.style.display='none';this.parentElement.textContent='Calc';">
 </button>
 <div id="calcPopup" role="dialog" aria-label="Calculator">
   <div class="calc-head">
