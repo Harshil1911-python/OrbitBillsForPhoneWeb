@@ -5,8 +5,9 @@
   function plugin(n){ try{ return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins[n]; }catch(e){ return null; } }
 
   // Live site used when phone is online (hybrid mode). Keep in sync with app-config.json websiteUrl.
+  // PREFER_LIVE=false so the APK uses local www/ UI (our fixed mobile POS). Set true only after deploying the same UI to onrender.
   var LIVE_URL = "https://orbitbillsphone.onrender.com";
-  var PREFER_LIVE = true;
+  var PREFER_LIVE = false;
 
   function isOnLiveHost(){
     try{

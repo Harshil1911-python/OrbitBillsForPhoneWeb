@@ -153,10 +153,14 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 
   html,body{max-width:100%;overflow-x:hidden}
   body{
-    /* Reserve space for fixed header so content never scrolls under logo/menu */
-    padding-top:calc(52px + env(safe-area-inset-top, 0px));
-    background:var(--bg);
+    /* Reserve space for fixed header — match header height exactly (no extra gap) */
+    padding-top:calc(48px + env(safe-area-inset-top, 0px));
+    background:#f8fafc;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;
+    user-select:none;
   }
+  body input, body textarea, body select{ -webkit-user-select:text; user-select:text; }
 
   /* Permanent white strip behind status bar (battery / time) — never overscrolled */
   body::before{
@@ -175,15 +179,16 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     position:fixed!important;
     top:0;left:0;right:0;
     z-index:65;
-    padding:8px 12px;
-    padding-top:max(8px, env(safe-area-inset-top, 0px));
-    min-height:calc(52px + env(safe-area-inset-top, 0px));
+    padding:6px 12px;
+    padding-top:max(6px, env(safe-area-inset-top, 0px));
+    min-height:calc(48px + env(safe-area-inset-top, 0px));
+    height:calc(48px + env(safe-area-inset-top, 0px));
     flex-wrap:nowrap;gap:8px;
     align-items:center;
     box-sizing:border-box;
     background:#0b3d91!important;
     border-bottom:none!important;
-    box-shadow:0 2px 10px rgba(11,61,145,.28);
+    box-shadow:none;
   }
   body::before{background:#0b3d91!important}
   .brand{font-size:15px;gap:8px;min-width:0;line-height:1;align-items:center;color:#fff!important}
@@ -274,9 +279,9 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   }
   .sales-side{
     border-right:0;border-bottom:none;
-    padding:4px 12px 12px;overflow:visible;min-width:0;width:100%
+    padding:0 12px 12px;overflow:visible;min-width:0;width:100%
   }
-  .low-banner{margin-bottom:4px!important}
+  .low-banner{margin:0 0 4px!important;border-radius:0!important}
 
   /* Cart moves into bottom sheet on mobile — hide inline cart column content from flow
      but keep in DOM for JS. Visual cart is the sheet. */
@@ -398,13 +403,13 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 
   .m-sticky-tools{
     position:sticky;top:0;z-index:40;
-    background:var(--bg);padding:2px 0 4px;
-    margin:0 -12px;padding-left:12px;padding-right:12px;
-    border-bottom:1px solid var(--line);
+    background:#f8fafc;padding:8px 12px 8px;
+    margin:0 -12px;
+    border-bottom:1px solid #e2e8f0;
   }
   /* Top Products/Photos/Held/Recent removed — use bottom nav instead */
   .m-sticky-tools .panel-tabs{display:none!important;margin:0;height:0;overflow:hidden;padding:0;border:0}
-  .m-sticky-tools .search-bar{margin-bottom:6px}
+  .m-sticky-tools .search-bar{margin-bottom:6px;margin-top:0}
   .search-bar #scanField{
     max-width:none!important;flex:0 0 auto;min-width:0;
     order:4;display:none!important;
@@ -1037,9 +1042,9 @@ input,select,textarea{
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
       Scan
     </button>
-    <input id="productSearch" placeholder="Search name, SKU or barcode" autocomplete="off">
-    <select id="categoryFilter" title="Filter by category" style="max-width:140px;min-width:100px">
-      <option value="">All categories</option>
+    <input id="productSearch" placeholder="Search" autocomplete="off" inputmode="search" enterkeyhint="search">
+    <select id="categoryFilter" title="Categories" style="max-width:120px;min-width:96px">
+      <option value="">Categories</option>
     </select>
     <input id="scanField" placeholder="Barcode" style="max-width:120px" autocomplete="off">
   </div>
@@ -2158,7 +2163,7 @@ function refreshCategoryFilterOptions(){
   if(!el) return;
   const prev=el.value;
   const cats=Array.from(new Set((allProducts||[]).map(p=>String(p.category||"").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
-  el.innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  el.innerHTML='<option value="">Categories</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if(prev && cats.includes(prev)) el.value=prev;
 }
 let productListPageSize = 80;
@@ -2298,72 +2303,52 @@ document.getElementById("btnFilterExp")?.addEventListener("click",()=>{
 });
 document.getElementById("btnFilterClear")?.addEventListener("click",()=>setPosListFilter(""));
 (function initPosBottomNav(){
+  // Event delegation: bottom-nav HTML is AFTER this script, so getElementById was null
   function activateNav(nav){
-    document.querySelectorAll(".pos-nav-item").forEach(b=>b.classList.toggle("active", b.getAttribute("data-nav")===nav));
+    document.querySelectorAll(".pos-nav-item").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-nav")===nav);
+    });
   }
   function switchPanel(panelId){
-    document.querySelectorAll(".panel-tab").forEach(t=>{
+    document.querySelectorAll(".panel-tab").forEach(function(t){
       t.classList.toggle("active", t.dataset.panel === panelId);
     });
-    document.querySelectorAll(".sales-panel").forEach(p=>{
+    document.querySelectorAll(".sales-panel").forEach(function(p){
       p.classList.toggle("active", p.id === panelId);
     });
-    if(panelId === "heldPanel" && typeof loadHeld === "function") try{ loadHeld(); }catch(e){}
-    if(panelId === "recentPanel" && typeof renderRecentList === "function") try{ renderRecentList(); }catch(e){}
-    // Show search/filters only on product panels
+    if(panelId === "heldPanel" && typeof loadHeld === "function"){ try{ loadHeld(); }catch(e){} }
+    if(panelId === "recentPanel" && typeof renderRecentList === "function"){ try{ renderRecentList(); }catch(e){} }
     var tools = document.getElementById("mStickyTools");
     if(tools){
-      var showSearch = (panelId === "textPanel" || panelId === "photoPanel");
-      tools.style.display = showSearch ? "" : "none";
+      tools.style.display = (panelId === "textPanel" || panelId === "photoPanel") ? "" : "none";
     }
+    try{ window.scrollTo(0, 0); }catch(e){}
   }
   function openCalculator(){
     activateNav("calc");
-    if(typeof window.__orbitToggleCalc === "function"){
-      window.__orbitToggleCalc();
-      return;
-    }
+    if(typeof window.__orbitToggleCalc === "function"){ window.__orbitToggleCalc(); return; }
+    if(typeof window.__orbitOpenCalc === "function"){ window.__orbitOpenCalc(); return; }
     var popup = document.getElementById("calcPopup");
     if(popup){
-      var isOpen = popup.classList.contains("open") || popup.style.display === "block";
-      if(isOpen){
-        popup.classList.remove("open");
-        popup.style.display = "none";
-        window.__calcOpen = false;
-      } else {
-        popup.classList.add("open");
-        popup.style.display = "block";
-        window.__calcOpen = true;
-      }
+      popup.classList.add("open");
+      popup.style.display = "block";
+      window.__calcOpen = true;
     }
   }
-  document.getElementById("navTextPos")?.addEventListener("click",function(e){
-    e.preventDefault(); activateNav("text"); switchPanel("textPanel");
-  });
-  document.getElementById("navPhotoPos")?.addEventListener("click",function(e){
-    e.preventDefault(); activateNav("photo"); switchPanel("photoPanel");
-  });
-  document.getElementById("navHeld")?.addEventListener("click",function(e){
-    e.preventDefault(); activateNav("held"); switchPanel("heldPanel");
-  });
-  document.getElementById("navTransactions")?.addEventListener("click",function(e){
-    e.preventDefault(); activateNav("recent"); switchPanel("recentPanel");
-  });
-  document.getElementById("navCalculator")?.addEventListener("click",function(e){
-    e.preventDefault(); openCalculator();
-  });
-  // Keep bottom nav in sync if something else clicks panel tabs
-  document.querySelectorAll(".panel-tab").forEach(function(tab){
-    tab.addEventListener("click",function(){
-      var p = tab.dataset.panel;
-      if(p==="textPanel") activateNav("text");
-      else if(p==="photoPanel") activateNav("photo");
-      else if(p==="heldPanel") activateNav("held");
-      else if(p==="recentPanel") activateNav("recent");
-      var tools = document.getElementById("mStickyTools");
-      if(tools) tools.style.display = (p==="textPanel"||p==="photoPanel") ? "" : "none";
-    });
-  });
+  window.__orbitSwitchPosPanel = switchPanel;
+  window.__orbitActivatePosNav = activateNav;
+  document.addEventListener("click", function(e){
+    var item = e.target && e.target.closest && e.target.closest(".pos-nav-item");
+    if(!item) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var nav = item.getAttribute("data-nav");
+    if(nav === "text"){ activateNav("text"); switchPanel("textPanel"); }
+    else if(nav === "photo"){ activateNav("photo"); switchPanel("photoPanel"); }
+    else if(nav === "held"){ activateNav("held"); switchPanel("heldPanel"); }
+    else if(nav === "recent"){ activateNav("recent"); switchPanel("recentPanel"); }
+    else if(nav === "calc"){ openCalculator(); }
+  }, true);
 })();
 document.getElementById("textList")?.addEventListener("click",e=>{
   const row=e.target.closest(".text-row[data-pid]");
@@ -2407,9 +2392,19 @@ document.getElementById("scanField").addEventListener("keydown",e=>{
   processScanCode(code);
 });
 document.getElementById("btnScanPrimary")?.addEventListener("click",()=>{
-  const code=prompt("Scan or type barcode / SKU");
-  if(code==null) return;
-  processScanCode(code);
+  // Prefer native scan field / search — avoid browser prompt (shows URL on some WebViews)
+  const scanEl=document.getElementById("scanField");
+  const searchEl=document.getElementById("productSearch");
+  if(scanEl && window.getComputedStyle(scanEl).display!=="none"){
+    scanEl.focus();
+    scanEl.select();
+    return;
+  }
+  if(searchEl){
+    searchEl.focus();
+    searchEl.placeholder="Type barcode / SKU…";
+    setTimeout(function(){ if(searchEl.placeholder==="Type barcode / SKU…") searchEl.placeholder="Search"; }, 4000);
+  }
 });
 
 function applyClients(list){
