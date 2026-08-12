@@ -271,15 +271,19 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     background:#f8fafc;border-radius:10px;margin:2px 4px
   }
 
-  /* Single column — products primary; tight under header */
+  /* Single column — kill double top gap (base .layout had padding-top + body padding-top) */
   .layout{
     display:flex!important;flex-direction:column;
-    min-height:auto;
+    min-height:auto!important;
+    padding-top:0!important;
+    margin-top:0!important;
     padding-bottom:calc(118px + env(safe-area-inset-bottom,0px));
   }
   .sales-side{
     border-right:0;border-bottom:none;
-    padding:0 12px 12px;overflow:visible;min-width:0;width:100%
+    padding:0 10px 12px!important;
+    margin:0!important;
+    overflow:visible;min-width:0;width:100%
   }
   .low-banner{margin:0 0 4px!important;border-radius:0!important}
 
@@ -616,6 +620,8 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   }
   .layout{
     min-height:auto!important;
+    padding-top:0!important;
+    margin-top:0!important;
     padding-bottom:calc(118px + env(safe-area-inset-bottom,0px))!important;
     overflow:visible!important;
     touch-action:pan-y!important;
@@ -1289,6 +1295,35 @@ input,select,textarea{
     <div class="msg" id="shareSheetMsg" style="margin-top:10px"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" type="button" data-close="shareSheetModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scan: manual entry OR camera barcode (matches IndexedDB barcode/SKU) -->
+<div class="modal-bg" id="scanModal">
+  <div class="modal" style="padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:420px">
+    <h3>Scan product</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-4px 0 12px">Match barcode or SKU from your product list</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <button type="button" class="btn btn-primary" id="scanOptCamera" style="min-height:52px">Camera scan</button>
+      <button type="button" class="btn btn-ghost" id="scanOptManual" style="min-height:52px">Enter code</button>
+    </div>
+    <div id="scanManualBox" style="display:none;margin-bottom:10px">
+      <input id="scanManualInput" placeholder="Barcode or SKU" autocomplete="off" inputmode="text"
+        style="width:100%;min-height:48px;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;box-sizing:border-box">
+      <button type="button" class="btn btn-primary btn-block" id="scanManualGo" style="margin-top:8px;min-height:48px">Find product</button>
+    </div>
+    <div id="scanCameraBox" style="display:none;margin-bottom:10px">
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:#0f172a;aspect-ratio:4/3">
+        <video id="scanVideo" playsinline muted autoplay style="width:100%;height:100%;object-fit:cover;display:block"></video>
+        <div style="position:absolute;inset:18% 12%;border:2px solid rgba(255,255,255,.85);border-radius:12px;pointer-events:none"></div>
+      </div>
+      <p id="scanCameraStatus" style="font-size:12px;color:var(--muted);margin-top:8px;text-align:center">Point camera at barcode</p>
+      <button type="button" class="btn btn-ghost btn-block" id="scanCameraStop" style="margin-top:8px;min-height:44px">Stop camera</button>
+    </div>
+    <div class="msg" id="scanModalMsg" style="margin-top:6px"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="scanModalClose" data-close="scanModal">Close</button>
     </div>
   </div>
 </div>
@@ -2391,21 +2426,120 @@ document.getElementById("scanField").addEventListener("keydown",e=>{
   const code=e.target.value.trim(); e.target.value="";
   processScanCode(code);
 });
-document.getElementById("btnScanPrimary")?.addEventListener("click",()=>{
-  // Prefer native scan field / search — avoid browser prompt (shows URL on some WebViews)
-  const scanEl=document.getElementById("scanField");
-  const searchEl=document.getElementById("productSearch");
-  if(scanEl && window.getComputedStyle(scanEl).display!=="none"){
-    scanEl.focus();
-    scanEl.select();
-    return;
+(function initScanModal(){
+  var stream=null, raf=0, detector=null, lastCode="", lastAt=0;
+  function openModal(){
+    var m=document.getElementById("scanModal");
+    if(!m) return;
+    m.classList.add("open");
+    var msg=document.getElementById("scanModalMsg");
+    if(msg) msg.textContent="";
+    document.getElementById("scanManualBox").style.display="none";
+    document.getElementById("scanCameraBox").style.display="none";
   }
-  if(searchEl){
-    searchEl.focus();
-    searchEl.placeholder="Type barcode / SKU…";
-    setTimeout(function(){ if(searchEl.placeholder==="Type barcode / SKU…") searchEl.placeholder="Search"; }, 4000);
+  function closeModal(){
+    stopCamera();
+    var m=document.getElementById("scanModal");
+    if(m) m.classList.remove("open");
   }
-});
+  function stopCamera(){
+    if(raf){ cancelAnimationFrame(raf); raf=0; }
+    if(stream){
+      try{ stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+      stream=null;
+    }
+    var v=document.getElementById("scanVideo");
+    if(v){ try{ v.srcObject=null; }catch(e){} }
+  }
+  function onCode(code){
+    code=String(code||"").trim();
+    if(!code) return;
+    var now=Date.now();
+    if(code===lastCode && now-lastAt<1500) return;
+    lastCode=code; lastAt=now;
+    stopCamera();
+    closeModal();
+    if(typeof processScanCode==="function") processScanCode(code);
+    else if(typeof toast==="function") toast("Scanned: "+code);
+  }
+  async function startCamera(){
+    var box=document.getElementById("scanCameraBox");
+    var status=document.getElementById("scanCameraStatus");
+    var msg=document.getElementById("scanModalMsg");
+    document.getElementById("scanManualBox").style.display="none";
+    box.style.display="block";
+    if(status) status.textContent="Starting camera…";
+    stopCamera();
+    try{
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        throw new Error("Camera not available in this browser");
+      }
+      stream=await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{ facingMode:{ ideal:"environment" }, width:{ ideal:1280 }, height:{ ideal:720 } }
+      });
+      var v=document.getElementById("scanVideo");
+      v.srcObject=stream;
+      await v.play();
+      if(status) status.textContent="Point camera at barcode";
+      if("BarcodeDetector" in window){
+        try{
+          detector=new BarcodeDetector({ formats:["ean_13","ean_8","code_128","code_39","qr_code","upc_a","upc_e"] });
+        }catch(e){ detector=new BarcodeDetector(); }
+        var tick=async function(){
+          if(!stream) return;
+          try{
+            if(v.readyState>=2){
+              var codes=await detector.detect(v);
+              if(codes && codes.length){
+                var raw=codes[0].rawValue || codes[0].rawValue===0 ? codes[0].rawValue : (codes[0].data||"");
+                if(raw){ onCode(String(raw)); return; }
+              }
+            }
+          }catch(e){}
+          raf=requestAnimationFrame(tick);
+        };
+        raf=requestAnimationFrame(tick);
+      } else {
+        if(status) status.textContent="Live scan needs Chrome/Edge. Use Enter code, or type barcode in Search.";
+        if(msg) msg.textContent="BarcodeDetector not supported — use Enter code";
+      }
+    }catch(err){
+      if(status) status.textContent="Camera permission denied or unavailable";
+      if(msg) msg.textContent=String(err && err.message ? err.message : err);
+      if(typeof toast==="function") toast("Camera unavailable — use Enter code");
+    }
+  }
+  document.getElementById("btnScanPrimary")?.addEventListener("click",function(){
+    openModal();
+  });
+  document.getElementById("scanOptManual")?.addEventListener("click",function(){
+    stopCamera();
+    document.getElementById("scanCameraBox").style.display="none";
+    document.getElementById("scanManualBox").style.display="block";
+    var inp=document.getElementById("scanManualInput");
+    if(inp){ inp.value=""; setTimeout(function(){ inp.focus(); }, 50); }
+  });
+  document.getElementById("scanOptCamera")?.addEventListener("click",function(){
+    startCamera();
+  });
+  document.getElementById("scanCameraStop")?.addEventListener("click",function(){
+    stopCamera();
+    document.getElementById("scanCameraBox").style.display="none";
+  });
+  document.getElementById("scanManualGo")?.addEventListener("click",function(){
+    var inp=document.getElementById("scanManualInput");
+    onCode(inp && inp.value);
+  });
+  document.getElementById("scanManualInput")?.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){ e.preventDefault(); onCode(e.target.value); }
+  });
+  document.getElementById("scanModalClose")?.addEventListener("click",closeModal);
+  document.getElementById("scanModal")?.addEventListener("click",function(e){
+    if(e.target && e.target.id==="scanModal") closeModal();
+  });
+  window.__orbitOpenScanModal=openModal;
+})();
 
 function applyClients(list){
   allClients=list||[];
