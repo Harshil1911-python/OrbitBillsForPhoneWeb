@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0b3d91">
 <meta name="color-scheme" content="light">
 <title>Billing · OrbitBills</title>
 <link rel="icon" href="favicon.ico">
@@ -865,32 +865,55 @@ input,select,textarea{
 
 </head>
 <body>
-<div id="orbitBoot" style="display:flex;position:fixed;inset:0;z-index:2147483646;background:#f5f8fe;flex-direction:column;padding:20px 16px;">
-  <div class="sk-grid"><div class="sk-tile"></div><div class="sk-tile"></div><div class="sk-tile"></div><div class="sk-tile"></div></div>
-  <div class="sk-card">
-    <div class="sk-row"><div class="sk-avatar"></div><div class="sk-block"><div class="sk-line" style="width:55%"></div><div class="sk-line" style="width:35%;height:10px"></div></div></div>
-    <div class="sk-row"><div class="sk-avatar"></div><div class="sk-block"><div class="sk-line" style="width:48%"></div><div class="sk-line" style="width:30%;height:10px"></div></div></div>
+<div id="orbitBoot" style="display:flex;position:fixed;inset:0;z-index:2147483646;background:#0b3d91;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .28s ease,visibility .28s ease;">
+  <div style="width:88px;height:88px;border-radius:22px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:18px;animation:orbitPulse 1.2s ease-in-out infinite;">
+    <img data-orbit-logo src="logo.png" alt="" style="height:48px;width:auto;filter:brightness(0) invert(1);display:block" onerror="this.style.display='none'">
+  </div>
+  <div style="color:#fff;font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.02em;margin-bottom:6px">OrbitBills</div>
+  <div style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:22px">Loading billing</div>
+  <div style="width:140px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden">
+    <div style="height:100%;width:40%;background:#0d9f6e;border-radius:4px;animation:orbitBar 1s ease-in-out infinite"></div>
   </div>
 </div>
+<style>
+@keyframes orbitPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes orbitBar{0%{transform:translateX(-100%)}100%{transform:translateX(280%)}}
+@keyframes orbitFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes orbitPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.text-row,.photo-grid > *{animation:orbitFadeUp .28s ease both}
+.modal-bg.open .modal{animation:orbitPop .22s cubic-bezier(.32,.72,0,1) both}
+.m-cart-bar{transition:transform .2s ease,opacity .2s ease}
+.btn{transition:transform .12s ease,background .15s ease,box-shadow .15s ease,opacity .12s ease}
+.btn:active{transform:scale(.97)}
+.panel-tab{transition:background .15s ease,color .15s ease}
+.text-row{transition:background .15s ease,border-color .15s ease,transform .12s ease}
+.text-row:active{transform:scale(.99)}
+</style>
+<script src="orbit-assets.js"></script>
 <script>
 (function(){
   function killBoot(){
     try{
       var el = document.getElementById("orbitBoot");
-      if(!el) return;
+      if(!el || el.getAttribute("data-done")==="1") return;
       el.setAttribute("data-done","1");
-      el.className = "orbit-boot-done";
-      el.style.cssText = "display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;";
-      if(el.parentNode){ try{ el.parentNode.removeChild(el); }catch(e){} }
+      el.style.opacity = "0";
+      el.style.visibility = "hidden";
+      el.style.pointerEvents = "none";
+      setTimeout(function(){
+        try{
+          el.style.display = "none";
+          if(el.parentNode) el.parentNode.removeChild(el);
+        }catch(e){}
+      }, 300);
     }catch(e){}
   }
   window.__orbitHideBoot = killBoot;
-  // Hard deadlines — panel must appear within 1s
-  setTimeout(killBoot, 400);
-  setTimeout(killBoot, 800);
-  setTimeout(killBoot, 1000);
-  document.addEventListener("DOMContentLoaded", function(){ setTimeout(killBoot, 300); });
-  window.addEventListener("load", function(){ setTimeout(killBoot, 100); });
+  setTimeout(killBoot, 500);
+  setTimeout(killBoot, 900);
+  setTimeout(killBoot, 1400);
+  document.addEventListener("DOMContentLoaded", function(){ setTimeout(killBoot, 350); });
+  window.addEventListener("load", function(){ setTimeout(killBoot, 120); });
 })();
 </script>
 
