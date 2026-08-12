@@ -923,6 +923,19 @@ input,select,textarea{
 @keyframes skShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 
+
+<style data-orbit-native-polish>
+/* Native-feel polish for Capacitor / phone */
+@media (max-width: 768px) {
+  body { overscroll-behavior-y: none; }
+  .btn, button { -webkit-tap-highlight-color: transparent; }
+  .modal-bg.open { animation: orbitSheetIn .22s ease; }
+}
+@keyframes orbitSheetIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
 <body>
 <div id="orbitBoot" style="display:flex;position:fixed;inset:0;z-index:2147483646;background:#0b3d91;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .28s ease,visibility .28s ease;">
@@ -3138,6 +3151,7 @@ async function finalizeSale(payload, doPrint){
     }
     if (short.length) {
       toast("Low/out of stock: " + short.slice(0,3).join(", "));
+      try{ if(window.__orbitNotifyLowStock) window.__orbitNotifyLowStock(short); }catch(eN){}
     }
   }catch(e){}
   if(msg){ msg.textContent="Saving…"; msg.className="msg"; }
@@ -3196,6 +3210,12 @@ async function finalizeSale(payload, doPrint){
   try{ updateWhatsAppBtn(); }catch(e){}
   try{ if(window.__orbitHaptic) window.__orbitHaptic("success"); else if(navigator.vibrate) navigator.vibrate([12,40,12]); }catch(e){}
   try{ playInvoiceSuccessSound(); }catch(e){}
+  try{ if(window.__orbitPlaySuccessTone) window.__orbitPlaySuccessTone(); }catch(e){}
+  try{
+    var invNoN = (lastInvoicePayload && lastInvoicePayload.invoiceNumber) || (data && data.invoiceNumber) || "Invoice";
+    var totN = (typeof money === "function" && lastInvoicePayload) ? money(lastInvoicePayload.total) : "";
+    if(window.__orbitNotifyInvoice) window.__orbitNotifyInvoice(invNoN, totN);
+  }catch(e){}
   try{ if(typeof window.__orbitUpdateWakeLock==="function") window.__orbitUpdateWakeLock(); }catch(e){}
   try{
     if(doPrint) printLast();
@@ -3776,6 +3796,12 @@ async function runPosSync(force){
       banner.style.display="block";
       if(lowText) lowText.textContent="Low stock: "+low.slice(0,4).map(p=>p.name).join(", ");
       else banner.textContent="Low stock: "+low.slice(0,4).map(p=>p.name).join(", ");
+      try{
+        if(!sessionStorage.getItem("orbit_low_notif_sent")){
+          sessionStorage.setItem("orbit_low_notif_sent","1");
+          if(window.__orbitNotifyLowStock) window.__orbitNotifyLowStock(low.slice(0,6).map(function(x){ return x.name||x; }));
+        }
+      }catch(eN){}
       if(isMobilePos()){
         clearTimeout(window.__orbitLowBannerTimer);
         window.__orbitLowBannerTimer=setTimeout(()=>{ if(banner) banner.style.display="none"; }, 3000);
@@ -4079,6 +4105,12 @@ function refreshStockSummary(){
       if (!elE) return;
       const batches = (d && d.ok && d.batches) ? d.batches : [];
       if (!batches.length) { elE.innerHTML = '<span style="color:var(--muted)">None in 30 days</span>'; return; }
+      try{
+        if(batches.length && !sessionStorage.getItem("orbit_exp_notif_sent")){
+          sessionStorage.setItem("orbit_exp_notif_sent","1");
+          if(window.__orbitNotifyExpiring) window.__orbitNotifyExpiring(batches.slice(0,6).map(function(b){ return b.product_name||b.name||"Item"; }));
+        }
+      }catch(eN){}
       elE.innerHTML = batches.slice(0, 12).map(b =>
         `<div>${esc(b.product_name||b.name||"Item")} · ${esc(b.batch_number||"")} · exp ${esc(b.expiry_date||"")}</div>`
       ).join("") + (batches.length > 12 ? `<div style="opacity:.7">+${batches.length-12} more</div>` : "");
