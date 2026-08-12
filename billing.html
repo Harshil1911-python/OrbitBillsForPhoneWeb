@@ -188,8 +188,9 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   body::before{background:#0b3d91!important}
   .brand{font-size:15px;gap:8px;min-width:0;line-height:1;align-items:center;color:#fff!important}
   .brand .brand-mark{height:30px!important;display:flex;align-items:center}
-  .brand .brand-mark img{height:30px!important;width:auto;display:block;filter:brightness(0) invert(1)}
-  .brand .brand-name-text{display:inline!important;color:#fff!important;font-weight:700;font-size:16px;font-family:var(--display);letter-spacing:-0.02em}
+  .brand .brand-mark img{height:30px!important;width:auto;max-width:160px;display:block;filter:brightness(0) invert(1);object-fit:contain}
+  /* Logo image already includes TechSerenia wordmark — avoid double text */
+  .brand .brand-name-text{display:none!important}
   .brand span:not(.brand-name-text){display:none}
   .header-actions{gap:6px;flex-wrap:nowrap;overflow:visible;width:auto;margin-left:auto;align-items:center}
   .header-actions > .btn,
@@ -273,8 +274,9 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
   }
   .sales-side{
     border-right:0;border-bottom:none;
-    padding:6px 12px 12px;overflow:visible;min-width:0;width:100%
+    padding:4px 12px 12px;overflow:visible;min-width:0;width:100%
   }
+  .low-banner{margin-bottom:4px!important}
 
   /* Cart moves into bottom sheet on mobile — hide inline cart column content from flow
      but keep in DOM for JS. Visual cart is the sheet. */
@@ -396,11 +398,12 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 
   .m-sticky-tools{
     position:sticky;top:0;z-index:40;
-    background:var(--bg);padding:4px 0 6px;
+    background:var(--bg);padding:2px 0 4px;
     margin:0 -12px;padding-left:12px;padding-right:12px;
     border-bottom:1px solid var(--line);
   }
-  .m-sticky-tools .panel-tabs{margin-bottom:6px}
+  /* Top Products/Photos/Held/Recent removed — use bottom nav instead */
+  .m-sticky-tools .panel-tabs{display:none!important;margin:0;height:0;overflow:hidden;padding:0;border:0}
   .m-sticky-tools .search-bar{margin-bottom:6px}
   .search-bar #scanField{
     max-width:none!important;flex:0 0 auto;min-width:0;
@@ -524,16 +527,8 @@ th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
     min-height:48px!important;font-weight:700!important;border-radius:12px!important
   }
 
-  /* Calculator above cart bar + bottom nav */
-  #calcFab{
-    right:14px!important;
-    bottom:calc(130px + env(safe-area-inset-bottom,0px))!important;
-    z-index:10050!important;
-    touch-action:manipulation!important;
-  }
-  body.m-cart-open #calcFab{
-    bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;
-  }
+  /* Floating calculator removed on mobile — use bottom nav Calculator */
+  #calcFab{display:none!important}
   #calcPopup{
     left:50%!important;right:auto!important;
     top:50%!important;bottom:auto!important;
@@ -1054,7 +1049,7 @@ input,select,textarea{
     <button type="button" class="pos-filter-btn pos-filter-clear" id="btnFilterClear" style="display:none">Clear filter</button>
   </div>
   </div>
-  <div class="sales-panel active" id="textPanel"><div class="text-list" id="textList"></div><div class="empty" id="textEmpty">Type to search products by name, SKU or barcode</div><button type="button" class="btn btn-ghost btn-block" id="btnShowMoreProducts" style="display:none">Show more products</button></div>
+  <div class="sales-panel active" id="textPanel"><div class="text-list" id="textList"></div><div class="empty" id="textEmpty">Scan barcode or search for a product</div><button type="button" class="btn btn-ghost btn-block" id="btnShowMoreProducts" style="display:none">Show more products</button></div>
   <div class="sales-panel" id="photoPanel"><div class="photo-grid" id="photoGrid"></div><button type="button" class="btn btn-ghost btn-block" id="btnShowMorePhotos" style="display:none;margin-top:8px">Show more</button></div>
   <div class="sales-panel" id="heldPanel"><div class="toolbar"><button class="btn btn-primary btn-sm" id="btnHold" type="button">Hold cart</button></div><div id="heldList"></div></div>
   <div class="sales-panel" id="recentPanel">
@@ -2307,25 +2302,66 @@ document.getElementById("btnFilterClear")?.addEventListener("click",()=>setPosLi
     document.querySelectorAll(".pos-nav-item").forEach(b=>b.classList.toggle("active", b.getAttribute("data-nav")===nav));
   }
   function switchPanel(panelId){
-    const tab = document.querySelector('.panel-tab[data-panel="'+panelId+'"]');
-    if(tab) tab.click();
+    document.querySelectorAll(".panel-tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.panel === panelId);
+    });
+    document.querySelectorAll(".sales-panel").forEach(p=>{
+      p.classList.toggle("active", p.id === panelId);
+    });
+    if(panelId === "heldPanel" && typeof loadHeld === "function") try{ loadHeld(); }catch(e){}
+    if(panelId === "recentPanel" && typeof renderRecentList === "function") try{ renderRecentList(); }catch(e){}
+    // Show search/filters only on product panels
+    var tools = document.getElementById("mStickyTools");
+    if(tools){
+      var showSearch = (panelId === "textPanel" || panelId === "photoPanel");
+      tools.style.display = showSearch ? "" : "none";
+    }
   }
-  document.getElementById("navTextPos")?.addEventListener("click",()=>{ activateNav("text"); switchPanel("textPanel"); });
-  document.getElementById("navPhotoPos")?.addEventListener("click",()=>{ activateNav("photo"); switchPanel("photoPanel"); });
-  document.getElementById("navHeld")?.addEventListener("click",()=>{ activateNav("held"); switchPanel("heldPanel"); });
-  document.getElementById("navTransactions")?.addEventListener("click",()=>{ activateNav("recent"); switchPanel("recentPanel"); });
-  document.getElementById("navCalculator")?.addEventListener("click",()=>{
+  function openCalculator(){
     activateNav("calc");
-    const fab = document.getElementById("calcFab");
-    if(fab) fab.click();
+    if(typeof window.__orbitToggleCalc === "function"){
+      window.__orbitToggleCalc();
+      return;
+    }
+    var popup = document.getElementById("calcPopup");
+    if(popup){
+      var isOpen = popup.classList.contains("open") || popup.style.display === "block";
+      if(isOpen){
+        popup.classList.remove("open");
+        popup.style.display = "none";
+        window.__calcOpen = false;
+      } else {
+        popup.classList.add("open");
+        popup.style.display = "block";
+        window.__calcOpen = true;
+      }
+    }
+  }
+  document.getElementById("navTextPos")?.addEventListener("click",function(e){
+    e.preventDefault(); activateNav("text"); switchPanel("textPanel");
   });
-  document.querySelectorAll(".panel-tab").forEach(tab=>{
-    tab.addEventListener("click",()=>{
-      const p = tab.dataset.panel;
+  document.getElementById("navPhotoPos")?.addEventListener("click",function(e){
+    e.preventDefault(); activateNav("photo"); switchPanel("photoPanel");
+  });
+  document.getElementById("navHeld")?.addEventListener("click",function(e){
+    e.preventDefault(); activateNav("held"); switchPanel("heldPanel");
+  });
+  document.getElementById("navTransactions")?.addEventListener("click",function(e){
+    e.preventDefault(); activateNav("recent"); switchPanel("recentPanel");
+  });
+  document.getElementById("navCalculator")?.addEventListener("click",function(e){
+    e.preventDefault(); openCalculator();
+  });
+  // Keep bottom nav in sync if something else clicks panel tabs
+  document.querySelectorAll(".panel-tab").forEach(function(tab){
+    tab.addEventListener("click",function(){
+      var p = tab.dataset.panel;
       if(p==="textPanel") activateNav("text");
       else if(p==="photoPanel") activateNav("photo");
       else if(p==="heldPanel") activateNav("held");
       else if(p==="recentPanel") activateNav("recent");
+      var tools = document.getElementById("mStickyTools");
+      if(tools) tools.style.display = (p==="textPanel"||p==="photoPanel") ? "" : "none";
     });
   });
 })();
@@ -3924,6 +3960,9 @@ window.__calcOpen = false;
     if (isCalcOpen()) closeCalc();
     else openCalc();
   }
+  window.__orbitToggleCalc = toggleCalc;
+  window.__orbitOpenCalc = openCalc;
+  window.__orbitCloseCalc = closeCalc;
   // Event delegation so it works even if nodes are after this script
   document.addEventListener("click", function(e){
     const fab = e.target.closest && e.target.closest("#calcFab");
