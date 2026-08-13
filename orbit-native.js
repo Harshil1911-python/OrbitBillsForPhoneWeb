@@ -220,14 +220,44 @@
     if(navigator.share){ try{ await navigator.share({ title: title, text: text, url: opts.url }); return true; }catch(e){ if(e && e.name === "AbortError") return true; } }
     return false;
   };
+
+  window.__orbitSaveToGallery = async function(opts){
+    opts = opts || {}; var blob = opts.blob; var filename = opts.filename || ("invoice-" + Date.now() + ".png"); if(!blob) return false;
+    var Filesystem = plugin("Filesystem"); var Share = plugin("Share");
+    if(hasCap() && Filesystem && Filesystem.writeFile){
+      try{
+        var b64 = await blobToBase64(blob);
+        var paths = [{ path: "Pictures/TechSerenia/" + filename, directory: "EXTERNAL_STORAGE" }, { path: "DCIM/TechSerenia/" + filename, directory: "EXTERNAL_STORAGE" }, { path: "TechSerenia/" + filename, directory: "DOCUMENTS" }, { path: "TechSerenia/" + filename, directory: "DATA" }, { path: "TechSerenia/" + filename, directory: "CACHE" }];
+        var uri = null;
+        for(var i = 0; i < paths.length && !uri; i++){
+          try{ await Filesystem.writeFile({ path: paths[i].path, data: b64, directory: paths[i].directory, recursive: true }); var uriRes = await Filesystem.getUri({ path: paths[i].path, directory: paths[i].directory }); uri = uriRes && (uriRes.uri || uriRes); }catch(eW){}
+        }
+        if(uri && Share && Share.share){ try{ await Share.share({ title: "Save invoice", text: "Save to Gallery or Files", dialogTitle: "Save invoice", files: [uri], url: uri }); return true; }catch(eS){} }
+        if(uri) return true;
+      }catch(e){}
+    }
+    try{ var url = URL.createObjectURL(blob); var a = document.createElement("a"); a.href = url; a.download = filename; (document.body || document.documentElement).appendChild(a); a.click(); setTimeout(function(){ try{ a.remove(); URL.revokeObjectURL(url); }catch(e){} }, 1500); return true; }catch(e2){ return false; }
+  };
+
   window.__orbitHaptic = async function(style){ try{ if(!hasCap()){ if(navigator.vibrate) navigator.vibrate(style === "error" ? 30 : 12); return; } var H = plugin("Haptics"); if(!H) return; if(style === "success" && H.notification) await H.notification({ type: "SUCCESS" }); else if(style === "error" && H.notification) await H.notification({ type: "ERROR" }); else if(H.impact) await H.impact({ style: "LIGHT" }); }catch(e){} };
   window.__orbitPlaySuccessTone = function(){ try{ if(typeof window.playInvoiceSuccessSound === "function"){ window.playInvoiceSuccessSound(); return; } var Ctx = window.AudioContext || window.webkitAudioContext; if(!Ctx) return; var ctx = window.__orbitToneCtx || (window.__orbitToneCtx = new Ctx()); if(ctx.state === "suspended") ctx.resume(); var now = ctx.currentTime; function tone(freq, start, dur, gain){ var o = ctx.createOscillator(); var g = ctx.createGain(); o.type = "sine"; o.frequency.value = freq; g.gain.setValueAtTime(0.0001, start); g.gain.exponentialRampToValueAtTime(gain, start + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, start + dur); o.connect(g); g.connect(ctx.destination); o.start(start); o.stop(start + dur + 0.02); } tone(880, now, 0.12, 0.09); tone(1174.66, now + 0.09, 0.16, 0.07); }catch(e){} };
 
+  function loadPostPay(){
+    try{
+      if(window.__orbitPostPayLoaded) return;
+      var s = document.createElement("script");
+      s.src = "orbit-postpay.js";
+      s.async = true;
+      (document.head || document.body || document.documentElement).appendChild(s);
+    }catch(e){}
+  }
+
   async function ready(){
+    loadPostPay();
     try{ if(hasCap() && isOnLiveHost() && !navigator.onLine){ await switchToOfflineLocal(); return true; } }catch(e){}
     try{ if(await tryHybridLiveRedirect()) return true; }catch(e){}
     try{ if(hasCap() && isLocalCapOrigin()) setTimeout(function(){ importDbFromNative({}); }, 600); }catch(e){}
-    if(!hasCap()){ setupNetwork(); setupBackButton(); try{ ensureNavFill("#ffffff"); }catch(e){} return false; }
+    if(!hasCap()){ setupNetwork(); setupBackButton(); try{ ensureNavFill("#ffffff"); }catch(e){} loadPostPay(); return false; }
     await setChromeColors();
     try{ var Splash = plugin("SplashScreen"); if(Splash && Splash.hide) await Splash.hide({ fadeOutDuration: 250 }); }catch(e){}
     try{ var Keyboard = plugin("Keyboard"); if(Keyboard && Keyboard.setResizeMode) await Keyboard.setResizeMode({ mode: "body" }); }catch(e){}
@@ -235,6 +265,7 @@
     try{ await ensureNotifChannel(); }catch(e){}
     try{ if(/billing\.html/i.test(location.pathname || "") && navigator.wakeLock && navigator.wakeLock.request){ try{ window.__orbitWake = await navigator.wakeLock.request("screen"); }catch(e){} } }catch(e){}
     try{ if(hasCap() && isLocalCapOrigin()) setInterval(function(){ exportDbToNative(); }, 60000); }catch(e){}
+    loadPostPay();
     return true;
   }
 
@@ -277,6 +308,7 @@
     window.__orbitAndroidBack = function(){
       if(document.body && document.body.classList.contains("m-cart-open")){ if(window.__orbitCloseMobileCart) window.__orbitCloseMobileCart(); else document.body.classList.remove("m-cart-open"); return true; }
       var menu = document.getElementById("mobileMenu"); if(menu && menu.classList.contains("open")){ if(window.__orbitCloseMobileMenu) window.__orbitCloseMobileMenu(); else menu.classList.remove("open"); return true; }
+      var postPay = document.getElementById("postPayActionModal"); if(postPay && postPay.classList.contains("open")){ postPay.classList.remove("open"); return true; }
       var openModalEl = document.querySelector(".modal-bg.open"); if(openModalEl){ openModalEl.classList.remove("open"); return true; }
       var offModal = document.getElementById("orbitOfflineModal"); if(offModal && offModal.style.display === "flex"){ hideOfflineModal(); return true; }
       if(window.history.length > 1){ history.back(); return true; }
